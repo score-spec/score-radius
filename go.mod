@@ -4,7 +4,7 @@ go 1.25.1
 
 require (
 	dario.cat/mergo v1.0.2
-	github.com/score-spec/score-go v1.11.4
+	github.com/score-spec/score-go v1.11.5
 	github.com/spf13/cobra v1.10.1
 	github.com/spf13/pflag v1.0.10
 	github.com/stretchr/testify v1.11.1
