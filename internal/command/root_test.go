@@ -62,7 +62,7 @@ func executeAndResetCommand(ctx context.Context, cmd *cobra.Command, args []stri
 
 func TestRootUnknown(t *testing.T) {
 	stdout, stderr, err := executeAndResetCommand(context.Background(), rootCmd, []string{"unknown"})
-	assert.EqualError(t, err, "unknown command \"unknown\" for \"score-implementation-sample\"")
+	assert.EqualError(t, err, "unknown command \"unknown\" for \"score-radius\"")
 	assert.Equal(t, "", stdout)
 	assert.Equal(t, "", stderr)
 }

@@ -24,7 +24,7 @@ import (
 	scoretypes "github.com/score-spec/score-go/types"
 	"gopkg.in/yaml.v3"
 
-	"github.com/score-spec/score-implementation-sample/internal/state"
+	"github.com/score-spec/score-radius/internal/state"
 )
 
 func Workload(currentState *state.State, workloadName string) (map[string]interface{}, error) {
