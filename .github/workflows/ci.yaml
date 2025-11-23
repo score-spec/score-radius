@@ -29,7 +29,7 @@ jobs:
           context: .
           push: false
           load: true
-          tags: score-implementation-sample:test
+          tags: score-radius:test
           build-args: |
             "VERSION=test"
       - name: make test-app

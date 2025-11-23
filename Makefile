@@ -12,25 +12,25 @@ help:
 .FORCE:
 
 build:
-	go build ./cmd/score-implementation-sample/
+	go build ./cmd/score-radius/
 
 test:
 	go vet ./...
 	go test ./... -cover -race
 
 test-app: build
-	./score-implementation-sample --version
-	./score-implementation-sample init
+	./score-radius --version
+	./score-radius init
 	cat score.yaml
-	./score-implementation-sample generate score.yaml
+	./score-radius generate score.yaml
 	cat manifests.yaml
 
 build-container:
-	docker build -t score-implementation-sample:local .
+	docker build -t score-radius:local .
 
 test-container: build-container
-	docker run --rm score-implementation-sample:local --version
-	docker run --rm -v .:/score-implementation-sample score-implementation-sample:local init
+	docker run --rm score-radius:local --version
+	docker run --rm -v .:/score-radius score-radius:local init
 	cat score.yaml
-	docker run --rm -v .:/score-implementation-sample score-implementation-sample:local generate score.yaml
+	docker run --rm -v .:/score-radius score-radius:local generate score.yaml
 	cat manifests.yaml

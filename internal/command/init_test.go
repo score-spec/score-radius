@@ -24,7 +24,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/score-spec/score-implementation-sample/internal/state"
+	"github.com/score-spec/score-radius/internal/state"
 )
 
 func TestInitNominal(t *testing.T) {

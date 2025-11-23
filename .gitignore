@@ -1,5 +1,5 @@
-.score-implementation-sample/
+.score-radius/
 score.yaml
 .idea/
 manifests.yaml
-/score-implementation-sample
+/score-radius
