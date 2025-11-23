@@ -1,0 +1,5 @@
+.score-implementation-sample/
+score.yaml
+.idea/
+manifests.yaml
+/score-implementation-sample
