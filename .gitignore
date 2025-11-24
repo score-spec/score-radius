@@ -1,5 +1,11 @@
-.score-radius/
-score.yaml
-.idea/
-manifests.yaml
 /score-radius
+
+.idea/
+
+score.yaml
+
+.score-radius/
+app.bicep
+
+.score-compose/
+compose.yaml
