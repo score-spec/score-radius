@@ -9,6 +9,7 @@ Initialize the local state directory and sample Score file.
 
 - `--file`|`-f` - The score file to initialize (default `score.yaml`).
 - `--no-sample` - Disable generation of the sample score file.
+- `--provisioners` - 
 
 ## `score-radius generate`
 

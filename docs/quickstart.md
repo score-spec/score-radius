@@ -85,9 +85,7 @@ At this stage, here are the files you have locally:
 
 Initialize the current `score-radius` workspace:
 ```bash
-../score-radius init --no-sample
-
-cp ../examples/provisioners/redis.provisioners.yaml .score-radius/
+../score-radius init --no-sample --provisioners ../examples/provisioners/redis.provisioners.yaml
 ```
 
 See the available resource types:
@@ -159,6 +157,15 @@ kubectl port-forward FIXME
 ## See the application in the Radius dashboard
 
 ![](./images/demo-with-redis-graph.png)
+
+Run this command line too:
+```bash
+rad app graph -a demo
+```
+
+```none
+FIXME
+```
 
 ## As Developer, deploy my Workload locally with Docker Compose
 

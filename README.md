@@ -34,4 +34,5 @@ docker run --rm -it -v .:/score-radius score-radius:local generate score.yaml \
 ## Docs
 
 - [CLI](./docs/cli.md)
+- [Quickstart](./docs/quickstart.md)
 - [Known limitations](./docs/known-limitations.md)
