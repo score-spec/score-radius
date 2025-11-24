@@ -78,7 +78,6 @@ func displayProvisioners(provisioners []provisioners.Provisioner, outputFormat s
 		type jsonData struct {
 			Type        string
 			Class       string
-			Format      string
 			Params      []string
 			Outputs     []string
 			Description string
@@ -88,7 +87,6 @@ func displayProvisioners(provisioners []provisioners.Provisioner, outputFormat s
 			outputs = append(outputs, jsonData{
 				Type:        provisioner.ResType,
 				Class:       provisioner.Class,
-				Format:      provisioner.Format,
 				Params:      provisioner.Params,
 				Outputs:     provisioner.Outputs,
 				Description: provisioner.Description,
@@ -98,9 +96,9 @@ func displayProvisioners(provisioners []provisioners.Provisioner, outputFormat s
 	default:
 		rows := [][]string{}
 		for _, provisioner := range sortedProvisioners {
-			rows = append(rows, []string{provisioner.ResType, provisioner.Class, provisioner.Format, strings.Join(provisioner.Params, ", "), strings.Join(provisioner.Outputs, ", "), provisioner.Description})
+			rows = append(rows, []string{provisioner.ResType, provisioner.Class, strings.Join(provisioner.Params, ", "), strings.Join(provisioner.Outputs, ", "), provisioner.Description})
 		}
-		headers := []string{"Type", "Class", "Format", "Params", "Outputs", "Description"}
+		headers := []string{"Type", "Class", "Params", "Outputs", "Description"}
 		outputFormatter = &formatter.TableOutputFormatter{
 			Headers: headers,
 			Rows:    rows,
