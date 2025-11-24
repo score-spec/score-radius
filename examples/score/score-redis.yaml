@@ -1,0 +1,24 @@
+# Example coming from this one: https://github.com/radius-project/samples/blob/v0.52/samples/demo/app.bicep
+apiVersion: score.dev/v1b1
+metadata:
+  name: demo
+containers:
+  demo:
+    image: .
+    variables:
+      CONNECTION_REDIS_HOST: ${resources.db.host}
+      CONNECTION_REDIS_PORT: ${resources.db.port}
+      CONNECTION_REDIS_USER: ${resources.db.username}
+      CONNECTION_REDIS_PASSWORD: ${resources.db.password}
+    livenessProbe:
+      httpGet:
+        path: /healthz
+        port: 3000
+service:
+  ports:
+    web:
+      port: 3000
+      targetPort: 3000
+resources:
+  db:
+    type: redis

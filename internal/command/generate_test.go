@@ -1,4 +1,4 @@
-// Copyright 2024 Humanitec
+// Copyright 2024 The Score Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -65,7 +65,9 @@ func TestInitAndGenerateWithBadFile(t *testing.T) {
 
 	assert.NoError(t, os.WriteFile(filepath.Join(td, "thing"), []byte(`"blah"`), 0644))
 
-	stdout, _, err = executeAndResetCommand(context.Background(), rootCmd, []string{"generate", "thing"})
+	stdout, _, err = executeAndResetCommand(context.Background(), rootCmd, []string{
+		"generate", "thing",
+	})
 	assert.EqualError(t, err, "failed to decode input score file: thing: yaml: unmarshal errors:\n  line 1: cannot unmarshal !!str `blah` into map[string]interface {}")
 	assert.Equal(t, "", stdout)
 }
@@ -78,7 +80,9 @@ func TestInitAndGenerateWithBadScore(t *testing.T) {
 
 	assert.NoError(t, os.WriteFile(filepath.Join(td, "thing"), []byte(`{}`), 0644))
 
-	stdout, _, err = executeAndResetCommand(context.Background(), rootCmd, []string{"generate", "thing"})
+	stdout, _, err = executeAndResetCommand(context.Background(), rootCmd, []string{
+		"generate", "thing",
+	})
 	assert.EqualError(t, err, "invalid score file: thing: jsonschema: '' does not validate with https://score.dev/schemas/score#/required: missing properties: 'apiVersion', 'metadata', 'containers'")
 	assert.Equal(t, "", stdout)
 }
@@ -89,23 +93,36 @@ func TestInitAndGenerate_with_sample(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, "", stdout)
 	stdout, _, err = executeAndResetCommand(context.Background(), rootCmd, []string{
-		"generate", "-o", "manifests.yaml", "--", "score.yaml",
+		"generate", "-o", "app.bicep", "--", "score.yaml",
 	})
 	require.NoError(t, err)
 	assert.Equal(t, "", stdout)
-	raw, err := os.ReadFile(filepath.Join(td, "manifests.yaml"))
+	raw, err := os.ReadFile(filepath.Join(td, "app.bicep"))
 	assert.NoError(t, err)
-	assert.Equal(t, `---
-apiVersion: score.dev/v1b1
-containers:
-    main:
-        image: stefanprodan/podinfo
-metadata:
-    name: example
-service:
-    ports:
-        web:
-            port: 8080
+	assert.Equal(t, `
+extension radius
+
+@description('The Radius Application ID. Injected automatically by the rad CLI.')
+param application string
+
+@description('The Radius Environment ID. Injected automatically by the rad CLI.')
+param environment string
+
+resource example 'Applications.Core/containers@2023-10-01-preview' = {
+  name: 'example'
+  properties: {
+    application: application
+    environment: environment
+    container: {
+      image: 'stefanprodan/podinfo'
+      ports: {
+        'web': {
+          port: 8080
+        }
+      }
+    }
+  }
+}
 `, string(raw))
 
 	// check that state was persisted
@@ -127,49 +144,94 @@ func TestInitAndGenerate_with_full_example(t *testing.T) {
 	assert.NoError(t, os.WriteFile(filepath.Join(td, "score.yaml"), []byte(`
 apiVersion: score.dev/v1b1
 metadata:
-    name: example
+  name: example
 containers:
-    main:
-        image: stefanprodan/podinfo
-        variables:
-            key: value
-            dynamic: ${metadata.name}
-        files:
-        - target: /somefile
-          content: |
-            ${metadata.name}
+  main:
+    image: stefanprodan/podinfo
+    command:
+      - "node"
+    args:
+      - packages/backend
+      - "--config"
+      - app-config.yaml
+    variables:
+      key: value
+      dynamic: ${metadata.name}
+    files:
+      /somefile:
+        content: |
+          ${metadata.name}
+service:
+  ports:
+    tcp:
+      port: 8080
+      targetPort: 8080
 resources:
-    thing:
-        type: something
-        params:
-          x: ${metadata.name}
+  thing:
+    type: something
+    params:
+      x: ${metadata.name}
 `), 0755))
 
+	assert.NoError(t, os.WriteFile(filepath.Join(td, ".score-radius", "something.provisioners.yaml"), []byte(`
+- uri: default://something
+  type: something
+  class: default
+`), 0644))
+
 	_, _, err = executeAndResetCommand(context.Background(), rootCmd, []string{
-		"generate", "-o", "manifests.yaml", "--", "score.yaml",
+		"generate", "-o", "app.bicep", "--", "score.yaml",
 	})
 	require.NoError(t, err)
-	raw, err := os.ReadFile(filepath.Join(td, "manifests.yaml"))
+	raw, err := os.ReadFile(filepath.Join(td, "app.bicep"))
 	assert.NoError(t, err)
-	assert.Equal(t, `---
-apiVersion: score.dev/v1b1
-containers:
-    main:
-        files:
-            /somefile:
-                content: |
-                    example
-                noExpand: true
-        image: stefanprodan/podinfo
-        variables:
-            dynamic: example
-            key: value
-metadata:
-    name: example
-resources:
-    thing:
-        params:
-            x: example
-        type: something
+	assert.Equal(t, `
+extension radius
+
+@description('The Radius Application ID. Injected automatically by the rad CLI.')
+param application string
+
+@description('The Radius Environment ID. Injected automatically by the rad CLI.')
+param environment string
+
+resource example 'Applications.Core/containers@2023-10-01-preview' = {
+  name: 'example'
+  properties: {
+    application: application
+    environment: environment
+    container: {
+      image: 'stefanprodan/podinfo'
+      command: [
+        'node'
+      ]
+      args: [
+        'packages/backend'
+        '--config'
+        'app-config.yaml'
+      ]
+      env: {
+        dynamic: {
+          value: 'example'
+        }
+        key: {
+          value: 'value'
+        }
+      }
+      ports: {
+        'tcp': {
+          port: 8080
+          containerPort: 8080
+        }
+      }
+    }
+    connections: {
+      thing: {
+        source: thing.id
+        disableDefaultEnvVars: false
+      }
+    }
+  }
+}
+
 `, string(raw))
 }

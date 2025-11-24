@@ -1,4 +1,4 @@
-// Copyright 2024 Humanitec
+// Copyright 2024 The Score Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@ package command
 
 import (
 	"log/slog"
+
 	"github.com/spf13/cobra"
 	"github.com/score-spec/score-radius/internal/version"
 )
