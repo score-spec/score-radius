@@ -41,12 +41,6 @@ Create a `score.yaml` with this content:
 apiVersion: score.dev/v1b1
 metadata:
   name: podinfo
-service:
-  ports:
-    http:
-      port: 9898
-      targetPort: 9898
-      protocol: TCP
 containers:
   podinfo:
     image: .
@@ -68,6 +62,12 @@ containers:
       httpGet:
         port: 9898
         path: /readyz
+service:
+  ports:
+    http:
+      port: 9898
+      targetPort: 9898
+      protocol: TCP
 resources:
   cache:
     type: redis
