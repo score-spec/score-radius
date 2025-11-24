@@ -54,7 +54,7 @@ containers:
       - ./podinfo
     args:
       - --port=9898
-      - --cache-server=tcp://$(REDIS_HOST):$(REDIS_PORT)
+      - --cache-server=tcp://$(CONNECTION_REDIS_HOST):$(CONNECTION_REDIS_PORT)
     variables:
       PODINFO_UI_COLOR: "#34577c"
       PODINFO_UI_MESSAGE: ""
@@ -71,6 +71,8 @@ containers:
 resources:
   cache:
     type: redis
+    params:
+      disableDefaultEnvVars: true
 ```
 
 At this stage, here are the files you have locally:

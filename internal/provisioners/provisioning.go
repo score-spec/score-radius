@@ -43,7 +43,7 @@ type Provisioner struct {
 	InitTemplate      string `yaml:"init,omitempty"`
 	ManifestsTemplate string `yaml:"manifests,omitempty"`
 	// Params is a list of inputs that the provisioner expects to be passed in.
-	Params []string `yaml:"inputs,omitempty"`
+	Params []string `yaml:"params,omitempty"`
 	// Outputs is a list of outputs that the provisioner should return.
 	Outputs []string `yaml:"expected_outputs,omitempty"`
 	// Outputs is a list of actual outputs evaluated from the template.

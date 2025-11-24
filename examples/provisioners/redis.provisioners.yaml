@@ -3,6 +3,8 @@
   type: redis
   class: default
   description: Generates a Applications.Datastores/redisCaches bicep resource
+  params: |
+    - disableDefaultEnvVars
   outputs: |
     connectionString: {{ print "${" .Init.name ".listSecrets().connectionString}" }}
     host: {{ print "${" .Init.name ".properties.host}" }}
