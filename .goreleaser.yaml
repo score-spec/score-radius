@@ -1,0 +1,56 @@
+# Check the documentation at https://goreleaser.com
+version: 2
+before:
+  hooks:
+    - go mod tidy
+builds:
+  - id: score-radius
+    binary: score-radius
+    main: ./cmd/score-radius
+    ldflags:
+      - -X github.com/score-spec/score-radius/internal/version.Version={{ .Version }}
+    env:
+      - CGO_ENABLED=0
+    targets:
+      - linux_amd64_v1
+      - linux_arm64
+      - windows_amd64_v1
+      - darwin_amd64_v1
+      - darwin_arm64
+archives:
+  - format_overrides:
+    - goos: windows
+      format: zip
+checksum:
+  name_template: 'checksums.txt'
+snapshot:
+  version_template: "{{ incpatch .Version }}-next"
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
+brews:
+  - name: score-radius
+    homepage: "https://score.dev"
+    repository:
+      owner: score-spec
+      name: homebrew-tap
+      token: "{{ .Env.TAP_GITHUB_TOKEN }}"
+    commit_author:
+      name: mathieu-benoit
+      email: mathieu-benoit@hotmail.fr
+signs:
+  - cmd: cosign
+    signature: "${artifact}.sig"
+    certificate: "${artifact}.pem"
+    args:
+      - sign-blob
+      - '--oidc-provider=github-actions'
+      - '--output-certificate=${certificate}' 
+      - '--output-signature=${signature}'
+      - '${artifact}'
+      - --yes
+    artifacts: all
+    output: true
