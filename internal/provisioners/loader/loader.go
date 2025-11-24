@@ -1,0 +1,133 @@
+// Copyright 2025 The Score Authors.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+package loader
+
+import (
+	"bytes"
+	"crypto/sha256"
+	"encoding/base64"
+	"encoding/binary"
+	"fmt"
+	"log/slog"
+	"math"
+	"net/url"
+	"os"
+	"path/filepath"
+	"strings"
+	"time"
+
+	"gopkg.in/yaml.v3"
+
+	"github.com/score-spec/score-radius/internal/provisioners"
+)
+
+const ProvisionersFileSuffix = ".provisioners.yaml"
+
+// LoadProvisionersFromDirectory loads all provisioners we can find in files that end in the common suffix.
+func LoadProvisionersFromDirectory(path string, filesSuffix string) ([]provisioners.Provisioner, error) {
+	slog.Debug(fmt.Sprintf("Loading provisioners with suffix %s in directory '%s'", filesSuffix, path))
+	items, err := os.ReadDir(path)
+	if err != nil {
+		return nil, err
+	}
+	out := make([]provisioners.Provisioner, 0)
+	for _, item := range items {
+		if !item.IsDir() && strings.HasSuffix(item.Name(), filesSuffix) {
+			raw, err := os.ReadFile(filepath.Join(path, item.Name()))
+			if err != nil {
+				return nil, fmt.Errorf("failed to read '%s': %w", item.Name(), err)
+			}
+			p, err := LoadProvisioners(raw)
+			if err != nil {
+				return nil, fmt.Errorf("failed to load '%s': %w", item.Name(), err)
+			}
+			out = append(out, p...)
+		}
+	}
+	return out, nil
+}
+
+// LoadProvisioners loads a list of provisioners from the raw contents from a yaml file.
+func LoadProvisioners(raw []byte) ([]provisioners.Provisioner, error) {
+	var intermediate []map[string]interface{}
+	if err := yaml.NewDecoder(bytes.NewReader(raw)).Decode(&intermediate); err != nil {
+		return nil, fmt.Errorf("failed to decode file: %w", err)
+	}
+	out := make([]provisioners.Provisioner, 0, len(intermediate))
+	for _, item := range intermediate {
+		provisioner := provisioners.Provisioner{}
+		intermediate, _ := yaml.Marshal(item)
+		dec := yaml.NewDecoder(bytes.NewReader(intermediate))
+		dec.KnownFields(true)
+		if err := dec.Decode(&provisioner); err != nil {
+			slog.Info("YAML reader error", "error", err)
+			return nil, err
+		}
+		if provisioner.Uri == "" {
+			return nil, fmt.Errorf("uri not set")
+		} else if u, err := url.Parse(provisioner.Uri); err != nil {
+			return nil, fmt.Errorf("invalid uri '%s'", u)
+		} else if u.Scheme == "" {
+			return nil, fmt.Errorf("missing uri schema '%s'", u)
+		} else if provisioner.ResType == "" {
+			return nil, fmt.Errorf("type not set")
+		}
+
+		slog.Debug(fmt.Sprintf("Loaded provisioner %s", provisioner.Uri))
+		out = append(out, provisioner)
+	}
+	return out, nil
+}
+
+// SaveProvisionerToDirectory saves the provisioner content (data) from the provisionerUrl to a new provisioners file
+// in the path directory.
+func SaveProvisionerToDirectory(path string, provisionerUrl string, data []byte) error {
+	// First validate whether this file contains valid provisioner data.
+	if _, err := LoadProvisioners(data); err != nil {
+		return fmt.Errorf("invalid provisioners file: %w", err)
+	}
+	// Append a heading indicating the source and time
+	data = append([]byte(fmt.Sprintf("# Downloaded from %s at %s\n", provisionerUrl, time.Now())), data...)
+	hashValue := sha256.Sum256([]byte(provisionerUrl))
+	hashName := base64.RawURLEncoding.EncodeToString(hashValue[:16]) + ProvisionersFileSuffix
+	// We use a time prefix to always put the most recently downloaded files first lexicographically. So subtract
+	// time from uint64 and convert it into a base64 two's complement binary representation.
+	timePrefix := base64.RawURLEncoding.EncodeToString(binary.BigEndian.AppendUint64([]byte{}, uint64(math.MaxInt64-time.Now().UnixNano())))
+
+	targetPath := filepath.Join(path, timePrefix+"."+hashName)
+	tmpPath := targetPath + ".tmp"
+	if err := os.WriteFile(tmpPath, data, 0600); err != nil {
+		return fmt.Errorf("failed to write file: %w", err)
+	} else if err := os.Rename(tmpPath, targetPath); err != nil {
+		return fmt.Errorf("failed to rename temp file: %w", err)
+	}
+	slog.Info(fmt.Sprintf("Wrote provisioner from '%s' to %s", provisionerUrl, targetPath))
+
+	// Remove any old files that have the same source.
+	if items, err := os.ReadDir(path); err != nil {
+		return err
+	} else {
+		for _, item := range items {
+			if strings.HasSuffix(item.Name(), hashName) && !strings.HasPrefix(item.Name(), timePrefix) {
+				if err := os.Remove(filepath.Join(path, item.Name())); err != nil {
+					return fmt.Errorf("failed to remove old copy of provisioner loaded from '%s': %w", provisionerUrl, err)
+				}
+				slog.Debug(fmt.Sprintf("Removed old copy of provisioner loaded from '%s'", provisionerUrl))
+			}
+		}
+	}
+
+	return nil
+}

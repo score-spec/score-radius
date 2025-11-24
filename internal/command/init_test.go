@@ -1,4 +1,4 @@
-// Copyright 2024 Humanitec
+// Copyright 2024 The Score Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -41,7 +41,9 @@ func TestInitNominal(t *testing.T) {
 	assert.Equal(t, "", stdout)
 	assert.NotEqual(t, "", strings.TrimSpace(stderr))
 
-	stdout, stderr, err = executeAndResetCommand(context.Background(), rootCmd, []string{"generate", "score.yaml"})
+	stdout, stderr, err = executeAndResetCommand(context.Background(), rootCmd, []string{
+		"generate", "score.yaml",
+	})
 	assert.NoError(t, err)
 	assert.Equal(t, ``, stdout)
 	assert.NotEqual(t, "", strings.TrimSpace(stderr))
@@ -54,6 +56,24 @@ func TestInitNominal(t *testing.T) {
 		assert.Equal(t, map[framework.ResourceUid]framework.ScoreResourceState[state.ResourceExtras]{}, sd.State.Resources)
 		assert.Equal(t, map[string]interface{}{}, sd.State.SharedState)
 	}
+}
+
+func TestInitNoSample(t *testing.T) {
+	td := t.TempDir()
+
+	wd, _ := os.Getwd()
+	require.NoError(t, os.Chdir(td))
+	defer func() {
+		require.NoError(t, os.Chdir(wd))
+	}()
+
+	stdout, stderr, err := executeAndResetCommand(context.Background(), rootCmd, []string{"init", "--no-sample"})
+	assert.NoError(t, err)
+	assert.Equal(t, "", stdout)
+	assert.NotEqual(t, "", strings.TrimSpace(stderr))
+
+	_, err = os.Stat("score.yaml")
+	assert.ErrorIs(t, err, os.ErrNotExist)
 }
 
 func TestInitNominal_run_twice(t *testing.T) {

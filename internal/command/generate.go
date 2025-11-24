@@ -1,4 +1,4 @@
-// Copyright 2024 Humanitec
+// Copyright 2024 The Score Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -32,6 +32,7 @@ import (
 
 	"github.com/score-spec/score-radius/internal/convert"
 	"github.com/score-spec/score-radius/internal/provisioners"
+	"github.com/score-spec/score-radius/internal/provisioners/loader"
 	"github.com/score-spec/score-radius/internal/state"
 )
 
@@ -115,7 +116,7 @@ var generateCmd = &cobra.Command{
 						slog.Info(fmt.Sprintf("Set container image for container '%s' to %s from --%s", containerName, v, generateCmdImageFlag))
 						workload.Containers[containerName] = container
 					} else {
-						return fmt.Errorf("failed to convert '%s' because container '%s' has no image and --image was not provided: %w", arg, containerName, err)
+						return fmt.Errorf("failed to convert '%s' because container '%s' has no image and --image was not provided", arg, containerName)
 					}
 				}
 			}
@@ -136,9 +137,14 @@ var generateCmd = &cobra.Command{
 
 		slog.Info("Primed resources", "#workloads", len(currentState.Workloads), "#resources", len(currentState.Resources))
 
-		outputManifests := make([]map[string]interface{}, 0)
+		localProvisioners, err := loader.LoadProvisionersFromDirectory(sd.Path, loader.ProvisionersFileSuffix)
+		if err != nil {
+			return fmt.Errorf("failed to load provisioners")
+		}
+		slog.Info("Loaded provisioners", "#provisioners", len(localProvisioners))
 
-		if currentState, err = provisioners.ProvisionResources(currentState); err != nil {
+		var resourcesManifests string
+		if resourcesManifests, currentState, err = provisioners.ProvisionResources(currentState, localProvisioners); err != nil {
 			return fmt.Errorf("failed to provision resources: %w", err)
 		}
 
@@ -148,20 +154,19 @@ var generateCmd = &cobra.Command{
 		}
 		slog.Info("Persisted state file")
 
+		out := new(bytes.Buffer)
 		for workloadName := range currentState.Workloads {
 			if manifest, err := convert.Workload(currentState, workloadName); err != nil {
 				return fmt.Errorf("failed to convert workloads: %w", err)
 			} else {
-				outputManifests = append(outputManifests, manifest)
+				out.WriteString(manifest)
 			}
 			slog.Info(fmt.Sprintf("Wrote manifest to manifests buffer for workload '%s'", workloadName))
 		}
 
-		out := new(bytes.Buffer)
-		for _, manifest := range outputManifests {
-			out.WriteString("---\n")
-			_ = yaml.NewEncoder(out).Encode(manifest)
-		}
+		out.WriteString(resourcesManifests)
+		slog.Info("Wrote resources manifests to manifests buffer")
+
 		v, _ := cmd.Flags().GetString(generateCmdOutputFlag)
 		if v == "" {
 			return fmt.Errorf("no output file specified")
@@ -220,9 +225,9 @@ func parseAndApplyOverrideProperty(entry string, flagName string, spec map[strin
 }
 
 func init() {
-	generateCmd.Flags().StringP(generateCmdOutputFlag, "o", "manifests.yaml", "The output manifests file to write the manifests to")
+	generateCmd.Flags().StringP(generateCmdOutputFlag, "o", "app.bicep", "The output manifests file to write the manifests to")
 	generateCmd.Flags().String(generateCmdOverridesFileFlag, "", "An optional file of Score overrides to merge in")
 	generateCmd.Flags().StringArray(generateCmdOverridePropertyFlag, []string{}, "An optional set of path=key overrides to set or remove")
-	generateCmd.Flags().String(generateCmdImageFlag, "", "An optional container image to use for any container with image == '.'")
+	generateCmd.Flags().StringP(generateCmdImageFlag, "i", "", "An optional container image to use for any container with image == '.'")
 	rootCmd.AddCommand(generateCmd)
 }

@@ -1,0 +1,27 @@
+# https://docs.radapp.io/reference/resources/applications/applications.datastores/2023-10-01-preview/rediscaches/
+- uri: template://default-provisioners/redis
+  type: redis
+  class: default
+  description: Generates a Applications.Datastores/redisCaches bicep resource
+  outputs: |
+    connectionString: {{ print "${" .Init.name ".listSecrets().connectionString}" }}
+    host: {{ print "${" .Init.name ".properties.host}" }}
+    port: {{ print "${" .Init.name ".properties.port}" }}
+    username: {{ print "${" .Init.name ".properties.username}" }}
+    password: {{ print "${" .Init.name ".listSecrets().password}" }}
+  expected_outputs:
+    - connectionString
+    - host
+    - password
+    - port
+    - username
+  init: |
+    name: {{ splitList "." .Id | last }}
+  manifests: |
+    resource {{ .Init.name }} 'Applications.Datastores/redisCaches@2023-10-01-preview' = {
+      name: '{{ .Init.name }}'
+      properties: {
+        application: application
+        environment: environment
+      }
+    }
