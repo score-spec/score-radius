@@ -90,6 +90,19 @@ Initialize the current `score-radius` workspace:
 cp ../examples/provisioners/redis.provisioners.yaml .score-radius/
 ```
 
+See the available resource types:
+```bash
+../score-radius provisioners list
+```
+
+```none
++-------+---------+-----------------------+--------------------------------------------------+----------------------------------------------------------------+
+| TYPE  |  CLASS  |        PARAMS         |                     OUTPUTS                      |                          DESCRIPTION                           |
++-------+---------+-----------------------+--------------------------------------------------+----------------------------------------------------------------+
+| redis | default | disableDefaultEnvVars | connectionString, host, password, port, username | Generates a Applications.Datastores/redisCaches bicep resource |
++-------+---------+-----------------------+--------------------------------------------------+----------------------------------------------------------------+
+```
+
 Generate the Radius's `app.bicep` file from the Score file:
 ```bash
 ../score-radius generate score.yaml \
