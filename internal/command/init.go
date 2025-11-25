@@ -22,20 +22,23 @@ import (
 
 	"github.com/score-spec/score-go/framework"
 	scoretypes "github.com/score-spec/score-go/types"
+	"github.com/score-spec/score-go/uriget"
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v3"
 
+	"github.com/score-spec/score-radius/internal/provisioners/loader"
 	"github.com/score-spec/score-radius/internal/state"
 )
 
 const (
 	initCmdFileFlag         = "file"
 	initCmdFileNoSampleFlag = "no-sample"
+	initCmdProvisionersFlag = "provisioners"
 )
 
 var initCmd = &cobra.Command{
 	Use:   "init",
-	Short: "Initialise the local state directory and sample score file",
+	Short: "Initialize the local state directory and sample Score file",
 	Args:  cobra.NoArgs,
 	CompletionOptions: cobra.CompletionOptions{
 		HiddenDefaultCmd: true,
@@ -99,6 +102,26 @@ var initCmd = &cobra.Command{
 			slog.Info("Skipping creation of initial Score file since it already exists", "file", initCmdScoreFile)
 		}
 
+		if v, _ := cmd.Flags().GetStringArray(initCmdProvisionersFlag); len(v) > 0 {
+			for i, vi := range v {
+				data, err := uriget.GetFile(cmd.Context(), vi)
+				if err != nil {
+					return fmt.Errorf("failed to load provisioners %d: %w", i+1, err)
+				}
+
+				var saveFilename string
+				if vi == "-" {
+					saveFilename = "from-stdin.provisioners.yaml"
+				} else {
+					saveFilename = vi
+				}
+
+				if err := loader.SaveProvisionerToDirectory(sd.Path, saveFilename, data); err != nil {
+					return fmt.Errorf("failed to save provisioner %d: %w", i+1, err)
+				}
+			}
+		}
+
 		return nil
 	},
 }
@@ -106,5 +129,6 @@ var initCmd = &cobra.Command{
 func init() {
 	initCmd.Flags().StringP(initCmdFileFlag, "f", "score.yaml", "The score file to initialize")
 	initCmd.Flags().Bool(initCmdFileNoSampleFlag, false, "Disable generation of the sample score file")
+	initCmd.Flags().StringArray(initCmdProvisionersFlag, nil, "Provisioner files to install. May be specified multiple times. Supports URI retrieval.")
 	rootCmd.AddCommand(initCmd)
 }

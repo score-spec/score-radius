@@ -35,15 +35,13 @@ test-app-with-full: build
 
 test-app-with-redis: build
 	./score-radius --version
-	./score-radius init --no-sample
-	cp examples/provisioners/redis.provisioners.yaml .score-radius/
+	./score-radius init --no-sample --provisioners examples/provisioners/redis.provisioners.yaml
 	./score-radius generate examples/score/score-redis.yaml -i ghcr.io/radius-project/samples/demo:latest
 	cat app.bicep
 
 test-app-with-podinfo: build
 	./score-radius --version
-	./score-radius init --no-sample
-	cp examples/provisioners/redis.provisioners.yaml .score-radius/
+	./score-radius init --no-sample --provisioners examples/provisioners/redis.provisioners.yaml
 	./score-radius generate examples/score/score-podinfo-with-redis.yaml -i ghcr.io/stefanprodan/podinfo
 	cat app.bicep
 
@@ -64,8 +62,7 @@ deploy-podinfo-to-radius:
 	rad workspace create kubernetes default
 	rad group create default --workspace default
 	rad env create default --group default
-	./score-radius init --no-sample
-	cp ./examples/provisioners/redis.provisioners.yaml .score-radius/
+	./score-radius init --no-sample --provisioners examples/provisioners/redis.provisioners.yaml
 	cp ./examples/score/score-podinfo.yaml ./score.yaml
 	./score-radius generate score.yaml -i ghcr.io/stefanprodan/podinfo:latest -o app.bicep
 	cat app.bicep

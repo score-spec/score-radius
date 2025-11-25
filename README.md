@@ -4,34 +4,14 @@
 
 ![](./docs/images/score-radius.png)
 
-With the CLI:
+- [Installation](./docs/installation.md)
+- [CLI](./docs/cli.md)
+- [Quickstart](./docs/quickstart.md)
+
 ```bash
-make build
-
-score-radius --version
-
 score-radius init
 
-score-radius generate score.yaml \
-    -a my-app-123 \
-    -e my-env-123 \
-    -o app.bicep
+score-radius generate score.yaml -o app.bicep
+
+rad run app.bicep --group default --application quickstart --environment default
 ```
-
-With the container image:
-```bash
-make build-container
-
-docker run --rm -it -v .:/score-radius score-radius:local init
-
-docker run --rm -it -v .:/score-radius score-radius:local generate score.yaml \
-    -a my-app-123 \
-    -e my-env-123 \
-    -o app.bicep
-```
-
-
-## Docs
-
-- [CLI](./docs/cli.md)
-- [Known limitations](./docs/known-limitations.md)
