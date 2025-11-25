@@ -1,7 +1,7 @@
 # Quickstart
 
 TOC:
-- [Prerequisities](#prerequisities)
+- [Prerequisities](#prerequisites)
 - [As Platform Engineer, set up Kind cluster with Radius](#as-platform-engineer-set-up-kind-cluster-with-radius)
 - [As Developer, describe your Workload with a Score file](#as-developer-describe-your-workload-with-a-score-file)
 - [In CI/CD, generate Radius's app.bicep from Score](#in-cicd-generate-radiuss-appbicep-from-score)
@@ -9,12 +9,12 @@ TOC:
 - [See the application in the Radius dashboard](#see-the-application-in-the-radius-dashboard)
 - [As Developer, deploy my Workload locally with Docker Compose](#as-developer-deploy-my-workload-locally-with-docker-compose)
 
-## Prerequisities
+## Prerequisites
 
-- Have Docker installed locally
+- Have Docker installed and running locally
 - Have `kind` CLi installed locally
 - Have `rad` CLi installed locally
-- Have `score-radius` CLi installed locally
+- Have `score-radius` CLI installed locally, see options [here](./installation.md).
 
 ## As Platform Engineer, set up Kind cluster with Radius
 
@@ -85,12 +85,12 @@ At this stage, here are the files you have locally:
 
 Initialize the current `score-radius` workspace:
 ```bash
-../score-radius init --no-sample --provisioners ../examples/provisioners/redis.provisioners.yaml
+score-radius init --no-sample --provisioners ../examples/provisioners/redis.provisioners.yaml
 ```
 
 See the available resource types:
 ```bash
-../score-radius provisioners list
+score-radius provisioners list
 ```
 
 ```none
@@ -103,7 +103,7 @@ See the available resource types:
 
 Generate the Radius's `app.bicep` file from the Score file:
 ```bash
-../score-radius generate score.yaml \
+score-radius generate score.yaml \
     -i ghcr.io/stefanprodan/podinfo:latest \
     -o app.bicep
 ```
@@ -168,6 +168,8 @@ FIXME
 ```
 
 ## As Developer, deploy my Workload locally with Docker Compose
+
+Install `score-compose`, see options [here](https://docs.score.dev/docs/score-implementation/score-compose/installation/).
 
 ```bash
 score-compose init --no-sample
