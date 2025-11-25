@@ -1,7 +1,7 @@
 # Quickstart
 
 TOC:
-- [Prerequisities](#prerequisites)
+- [Prerequisites](#prerequisites)
 - [As Platform Engineer, set up Kind cluster with Radius](#as-platform-engineer-set-up-kind-cluster-with-radius)
 - [As Developer, describe your Workload with a Score file](#as-developer-describe-your-workload-with-a-score-file)
 - [In CI/CD, generate Radius's app.bicep from Score](#in-cicd-generate-radiuss-appbicep-from-score)
@@ -26,6 +26,7 @@ TOC:
 rad workspace create kubernetes default
 rad group create default --workspace default
 rad env create default --group default
+rad recipe register default --environment default --resource-type "Applications.Datastores/redisCaches" --template-kind bicep --template-path "ghcr.io/radius-project/recipes/local-dev/rediscaches:latest"
 ```
 
 ## As Developer, describe your Workload with a Score file
@@ -160,11 +161,29 @@ kubectl port-forward FIXME
 
 Run this command line too:
 ```bash
-rad app graph -a demo
+rad app graph -a podinfo
 ```
 
 ```none
-FIXME
+Displaying application: podinfo
+
+Name: podinfo (Applications.Core/containers)
+Connections:
+  podinfo -> cache (Applications.Datastores/redisCaches)
+Resources:
+  podinfo (apps/Deployment)
+  podinfo (core/Secret)
+  podinfo (core/Service)
+  podinfo (core/ServiceAccount)
+  podinfo (rbac.authorization.k8s.io/Role)
+  podinfo (rbac.authorization.k8s.io/RoleBinding)
+
+Name: cache (Applications.Datastores/redisCaches)
+Connections:
+  podinfo (Applications.Core/containers) -> cache
+Resources:
+  redis-cnibclsbkpmss (apps/Deployment)
+  redis-cnibclsbkpmss (core/Service)
 ```
 
 ## As Developer, deploy my Workload locally with Docker Compose
