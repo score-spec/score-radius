@@ -46,6 +46,9 @@ test-app-with-podinfo: build
 	cat app.bicep
 
 test-container: build-container
+	mkdir test
+	sudo chown -R 65532:65532 test/
+	cd test
 	docker run --rm score-radius:local --version
 	docker run --rm -v .:/score-radius score-radius:local init
 	docker run --rm -v .:/score-radius score-radius:local generate score.yaml
