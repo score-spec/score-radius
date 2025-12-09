@@ -51,8 +51,7 @@ test-container: build-container
 	cd test
 	docker run --rm score-radius:local --version
 	docker run --rm -v .:/score-radius score-radius:local init
-	docker run --rm -v .:/score-radius score-radius:local generate score.yaml
-	cat app.bicep
+	cat score.yaml
 
 ## Create a local Kind cluster.
 .PHONY: setup-kind-cluster
