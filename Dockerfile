@@ -1,4 +1,4 @@
-FROM golang:1.25.5-alpine@sha256:26111811bc967321e7b6f852e914d14bede324cd1accb7f81811929a6a57fea9 AS builder
+FROM --platform=$BUILDPLATFORM golang:1.25.5-alpine@sha256:26111811bc967321e7b6f852e914d14bede324cd1accb7f81811929a6a57fea9 AS builder
 
 ARG VERSION
 
@@ -11,7 +11,7 @@ RUN go mod download
 
 # Copy the entire project and build it.
 COPY . .
-RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w -X github.com/score-spec/score-radius/internal/version.Version=${VERSION}" -o /usr/local/bin/score-radius ./cmd/score-radius
+RUN GOOS=${TARGETOS} GOARCH=${TARGETARCH} CGO_ENABLED=0 go build -ldflags="-s -w -X github.com/score-spec/score-radius/internal/version.Version=${VERSION}" -o /usr/local/bin/score-radius ./cmd/score-radius
 
 # We can use gcr.io/distroless/static since we don't rely on any linux libs or state, but we need ca-certificates to connect to https/oci with the init command.
 FROM gcr.io/distroless/static-debian13:nonroot@sha256:b5b9fd04c8dcf72a173183c0b7dee47e053e002246b308a59f3441db7b8b9cc4
