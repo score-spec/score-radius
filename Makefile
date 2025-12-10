@@ -64,10 +64,10 @@ deploy-podinfo-to-radius:
 	rad workspace create kubernetes default
 	rad group create default --workspace default
 	rad env create default --group default
-	#rad recipe register default --environment default --resource-type "Applications.Datastores/redisCaches" --template-kind bicep --template-path "ghcr.io/radius-project/recipes/local-dev/rediscaches:latest"
+	rad recipe register default --environment default --resource-type "Applications.Datastores/redisCaches" --template-kind bicep --template-path "ghcr.io/radius-project/recipes/local-dev/rediscaches:latest"
 	./score-radius init --no-sample --provisioners examples/provisioners/redis.provisioners.yaml
-	#cp ./examples/score/score-podinfo-with-redis.yaml ./score.yaml
-	cp ./examples/score/score-podinfo.yaml ./score.yaml
+	cp ./examples/score/score-podinfo-with-redis.yaml ./score.yaml
+	#cp ./examples/score/score-podinfo.yaml ./score.yaml
 	./score-radius generate score.yaml -i ghcr.io/stefanprodan/podinfo:latest -o app.bicep
 	cat app.bicep
 	cp ./examples/bicepconfig.json ./
