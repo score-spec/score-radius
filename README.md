@@ -7,6 +7,7 @@
 - [Installation](./docs/installation.md)
 - [CLI](./docs/cli.md)
 - [Quickstart](./docs/quickstart.md)
+- [Demo](./docs/demo.md)
 
 ```bash
 score-radius init
