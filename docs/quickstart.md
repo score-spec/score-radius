@@ -86,7 +86,7 @@ At this stage, here are the files you have locally:
 
 Initialize the current `score-radius` workspace:
 ```bash
-score-radius init --no-sample --provisioners ../examples/provisioners/redis.provisioners.yaml
+score-radius init --no-sample --provisioners https://raw.githubusercontent.com/score-spec/score-radius/refs/heads/main/examples/provisioners/redis.provisioners.yaml
 ```
 
 See the available resource types:
