@@ -40,6 +40,12 @@ If you want to run `score-radius` with the `init` subcommand to initialize your 
 docker run --rm -it -v .:/score-radius ghcr.io/score-spec/score-radius:latest init
 ```
 
+If you want to run `score-radius` as an unprivileged container, you would run the following command.
+
+```bash
+docker run --rm -it -v .:/score-radius --read-only --cap-drop=ALL --user=65532 ghcr.io/score-spec/score-radius:latest init
+```
+
 ## Manual download
 
 You can see the list of available files per OS and architecture in the [`score-radius`'s releases page](https://github.com/score-spec/score-radius/releases).
