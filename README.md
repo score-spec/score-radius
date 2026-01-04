@@ -8,6 +8,7 @@
 - [CLI](./docs/cli.md)
 - [Quickstart](./docs/quickstart.md)
 - [Demo](./docs/demo.md)
+  - Live demo delivered during the [Radius Community Call – 2025/12/09](https://youtu.be/XJorwBWmWCI?list=PLrZ6kld_pvgwYMLI-j_f0Dq2Dgv5MlK8R&t=1753)
 
 ```bash
 score-radius init
