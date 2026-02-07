@@ -1,15 +1,18 @@
-name: CI
+name: ci
 on:
+  # We run the CI checks on any pull request updates or pushes to the main branch after PR merge.
+  pull_request:
   push:
     branches:
       - main
-  pull_request:
+permissions:
+  contents: read
 jobs:
   test-code:
     runs-on: ubuntu-latest
     steps:
       - name: checkout
-        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - name: setup-go
         uses: actions/setup-go@7a3fe6cf4cb3a834922a1244abfce67bcef6a0c5 # v6.2.0
         with:
@@ -20,12 +23,33 @@ jobs:
         uses: golangci/golangci-lint-action@1e7e51e771db61008b38414a730f564565cf7c20 # v9.2.0
         with:
           version: latest
+  test-multi-arch-build:
+    uses: docker/github-builder/.github/workflows/build.yml@c767551a26459c30e1f683df73a12fdb918f7068 # v1.0.0
+    if: ${{ !github.event.pull_request.head.repo.fork }}
+    with:
+      output: image
+      push: false
+      platforms: linux/amd64,linux/arm64
+      sbom: true
+      context: .
+      set-meta-labels: true
+      set-meta-annotations: true
+      meta-images: |
+        score-radius
+      meta-tags: |
+        type=ref,event=pr
+    secrets:
+      registry-auths: |
+        - username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_TOKEN }}
   test-container:
     runs-on: ubuntu-latest
     if: ${{ !github.event.pull_request.head.repo.fork }}
+    permissions:
+      pull-requests: write
     steps:
       - name: checkout code in current PR branch
-        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           fetch-depth: 0
       - name: Set up Docker
@@ -43,7 +67,7 @@ jobs:
         with:
           version: latest
       - name: docker login
-        uses: docker/login-action@5e57cd118135c172c3672efd75eb46360885c0ef # v3.6.0
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3.7.0
         with:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_TOKEN }}
@@ -62,7 +86,7 @@ jobs:
         run: |
           docker images
       - name: checkout code in main branch
-        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           ref: main
       - name: Build container image from main branch
@@ -98,7 +122,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: checkout
-        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - name: Install Radius CLi
         run: |
           wget -q "https://raw.githubusercontent.com/radius-project/radius/main/deploy/install.sh" -O - | /bin/bash
