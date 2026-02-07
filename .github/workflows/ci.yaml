@@ -23,6 +23,25 @@ jobs:
         uses: golangci/golangci-lint-action@1e7e51e771db61008b38414a730f564565cf7c20 # v9.2.0
         with:
           version: latest
+  test-multi-arch-build:
+    uses: docker/github-builder/.github/workflows/build.yml@c767551a26459c30e1f683df73a12fdb918f7068 # v1.0.0
+    if: ${{ !github.event.pull_request.head.repo.fork }}
+    with:
+      output: image
+      push: false
+      platforms: linux/amd64,linux/arm64
+      sbom: true
+      context: .
+      set-meta-labels: true
+      set-meta-annotations: true
+      meta-images: |
+        score-radius
+      meta-tags: |
+        type=ref,event=pr
+    secrets:
+      registry-auths: |
+        - username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_TOKEN }}
   test-container:
     runs-on: ubuntu-latest
     if: ${{ !github.event.pull_request.head.repo.fork }}
