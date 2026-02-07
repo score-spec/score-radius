@@ -1,4 +1,4 @@
-FROM --platform=$BUILDPLATFORM golang:1.25.7-alpine@sha256:f6751d823c26342f9506c03797d2527668d095b0a15f1862cddb4d927a7a4ced AS builder
+FROM --platform=$BUILDPLATFORM dhi.io/golang:1.25.7-alpine3.23-dev@sha256:3911f7c6405bf6d2cbfd9d045cc7425ea6126ac3ebb7fb465f273ea9289909d9 AS builder
 
 ARG VERSION
 
@@ -13,8 +13,8 @@ RUN go mod download
 COPY . .
 RUN GOOS=${TARGETOS} GOARCH=${TARGETARCH} CGO_ENABLED=0 go build -ldflags="-s -w -X github.com/score-spec/score-radius/internal/version.Version=${VERSION}" -o /usr/local/bin/score-radius ./cmd/score-radius
 
-# We can use gcr.io/distroless/static since we don't rely on any linux libs or state, but we need ca-certificates to connect to https/oci with the init command.
-FROM gcr.io/distroless/static-debian13:nonroot@sha256:f9f84bd968430d7d35e8e6d55c40efb0b980829ec42920a49e60e65eac0d83fc
+# We can use static since we don't rely on any linux libs or state, but we need ca-certificates to connect to https/oci with the init command.
+FROM dhi.io/static:20251003-alpine3.23@sha256:f5c9799d5834f66db6912303ba88eaf53a3c7cc3ddc97a282a6bbd8672e15d24
 
 # Set the current working directory inside the container.
 WORKDIR /score-radius
