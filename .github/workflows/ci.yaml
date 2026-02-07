@@ -22,7 +22,6 @@ jobs:
           version: latest
   test-container:
     runs-on: ubuntu-latest
-    environment: ci-pr
     if: ${{ !github.event.pull_request.head.repo.fork }}
     steps:
       - name: checkout code in current PR branch
