@@ -1,5 +1,13 @@
 # score-radius
 
+---
+
+:warning: Experimental Notice :warning:
+
+Unlike the official Score implementations [score-compose](https://github.com/score-spec/score-compose) and [score-k8s](https://github.com/score-spec/score-k8s), `score-radius` is still in an experimental status. If you're interested in improving the `score-radius` implementation, we'd love to support you! Please reach out to us for assistance and collaboration.
+
+---
+
 `score-radius` is a Score implementation of the [Score specification](https://score.dev/) for [Radius](https://radapp.io/).
 
 ![](./docs/images/score-radius.png)
