@@ -15,6 +15,7 @@
 package command
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"log/slog"
@@ -92,8 +93,13 @@ var initCmd = &cobra.Command{
 						},
 					},
 				}
-				rawScore, _ := yaml.Marshal(workload)
-				if err := os.WriteFile(initCmdScoreFile, rawScore, 0755); err != nil {
+				var rawScoreBuf bytes.Buffer
+				rawScoreEnc := yaml.NewEncoder(&rawScoreBuf)
+				rawScoreEnc.SetIndent(2)
+				if err := rawScoreEnc.Encode(workload); err != nil {
+					return fmt.Errorf("failed to marshal Score file: %w", err)
+				}
+				if err := os.WriteFile(initCmdScoreFile, rawScoreBuf.Bytes(), 0755); err != nil {
 					return fmt.Errorf("failed to write Score file: %w", err)
 				}
 				slog.Info("Created initial Score file", "file", initCmdScoreFile)
