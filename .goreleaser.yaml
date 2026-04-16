@@ -9,6 +9,8 @@ builds:
     main: ./cmd/score-radius
     ldflags:
       - -X github.com/score-spec/score-radius/internal/version.Version={{ .Version }}
+      - -X github.com/score-spec/score-radius/internal/version.GitCommit={{ .Commit }}
+      - -X github.com/score-spec/score-radius/internal/version.BuildDate={{ .Date }}
     env:
       - CGO_ENABLED=0
     targets:
