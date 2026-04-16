@@ -21,8 +21,10 @@ import (
 	"github.com/score-spec/score-radius/internal/version"
 )
 
+var ScoreImplementationName = "score-radius"
+
 var rootCmd = &cobra.Command{
-	Use:           "score-radius",
+	Use:           ScoreImplementationName,
 	SilenceErrors: true,
 	CompletionOptions: cobra.CompletionOptions{
 		HiddenDefaultCmd: true,
@@ -37,6 +39,8 @@ var rootCmd = &cobra.Command{
 
 func init() {
 	rootCmd.Version = version.BuildVersionString()
+	rootCmd.SetVersionTemplate(`{{with .Name}}{{printf "%s " .}}{{end}}{{printf "%s" .Version}}
+`)
 }
 
 func Execute() error {
