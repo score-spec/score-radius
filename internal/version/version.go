@@ -71,6 +71,8 @@ func AssertVersion(constraint string, current string) error {
 			match = currentI >= compareI
 		case "=":
 			match = currentI == compareI
+		default:
+			return fmt.Errorf("invalid constraint operator '%s' in '%s'", op, constraint)
 		}
 		if !match {
 			return fmt.Errorf("current version %s does not match requested constraint %s", current, constraint)
