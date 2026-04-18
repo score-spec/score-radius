@@ -10,7 +10,8 @@ Initialize the local state directory and sample Score file.
 - `--file`|`-f` - The score file to initialize (default `score.yaml`).
 - `--no-sample` - Disables generation of the sample score file.
 - `--provisioners` - Loads provisioners files. May be specified multiple times. Supports the following formats: 
-  - `./local/path/file`
+  - `-` _(read from standard input)_
+  - `./local/path/file-or-folder`
   - `http://host/file`
   - `https://host/file`
   - `git-ssh://git@host/repo.git/file`
@@ -24,7 +25,7 @@ Run the conversion from Score file to output manifests.
 - `--image`|`-i` - An optional container image to use for any container with image == '.'.
 - `--output`|`-o` - The output manifests file to write the manifests to (default `app.bicep`).
 - `--override-property` - An optional set of path=key overrides to set or remove.
-- `--overrides-file` - `An optional file of Score overrides to merge in.
+- `--overrides-file` - An optional file of Score overrides to merge in.
 
 ## `score-radius provisioners`
 
