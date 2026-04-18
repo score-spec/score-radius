@@ -33,3 +33,14 @@ Run the conversion from Score file to output manifests.
 The list command will list out the resources provisioners. This requires an active `score-radius` state after `init` has been run. The list of resources provisioners will be empty if no provisioners are defined.
 
 - `--format`|`-f` - Format of the output: `table` (default), `json`.
+
+## `score-radius version`
+
+Show the version for `score-radius` and new version to update if available.
+
+- `--no-logo` - Do not show the Score logo.
+- `--no-updates-check` - Do not check for a new version.
+
+## `score-radius check-version`
+
+Assert that the version of `score-radius` matches the required constraint.
