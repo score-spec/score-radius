@@ -1,4 +1,4 @@
-FROM --platform=$BUILDPLATFORM dhi.io/golang:1.26.4-alpine3.23-dev@sha256:3ad0372332f4933bbb725b7716267145fc2859bd30d4fb222c1b8e02ce381908 AS builder
+FROM --platform=$BUILDPLATFORM dhi.io/golang:1.26.4-alpine3.23-dev@sha256:3c62ff766e4118b29b7815a0732affa1ac9836a67f5c505d5468ae08f7092a05 AS builder
 
 ARG VERSION
 ARG GIT_COMMIT=unknown
@@ -21,7 +21,7 @@ RUN GOOS=${TARGETOS} GOARCH=${TARGETARCH} CGO_ENABLED=0 \
     -o /usr/local/bin/score-radius ./cmd/score-radius
 
 # We can use static since we don't rely on any linux libs or state, but we need ca-certificates to connect to https/oci with the init command.
-FROM dhi.io/static:20260413-alpine3.23@sha256:27dbb924992679068bb5bdc76c9a97730d930354ea98c86917250bfe34aba098
+FROM dhi.io/static:20260413-alpine3.23@sha256:a00ce6c7df24f0e0b98977cc8511cc072960289d0904af36f528cc5ee0189e9c
 
 # Set the current working directory inside the container.
 WORKDIR /score-radius
