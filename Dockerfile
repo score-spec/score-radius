@@ -21,7 +21,7 @@ RUN GOOS=${TARGETOS} GOARCH=${TARGETARCH} CGO_ENABLED=0 \
     -o /usr/local/bin/score-radius ./cmd/score-radius
 
 # We can use static since we don't rely on any linux libs or state, but we need ca-certificates to connect to https/oci with the init command.
-FROM dhi.io/static:20260413-alpine3.23@sha256:a00ce6c7df24f0e0b98977cc8511cc072960289d0904af36f528cc5ee0189e9c
+FROM dhi.io/static:20260611-alpine3.23@sha256:6b342fd5db45e5857836ccc33b57327945d80594954278f965dd019cfd49bfae
 
 # Set the current working directory inside the container.
 WORKDIR /score-radius
