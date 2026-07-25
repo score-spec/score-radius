@@ -89,7 +89,8 @@ jobs:
           DOCKERHUB_OIDC_CONNECTIONID: ${{ vars.DOCKER_HUB_OIDC_CONNECTION_ID }}
         with:
           registry-auth: |
-            - username: ${{ vars.DOCKER_HUB_ORG }}
+            - registry: docker.io
+              username: ${{ vars.DOCKER_HUB_ORG }}
             - registry: dhi.io
               username: ${{ vars.DOCKER_HUB_ORG }}
       - name: Build container image from PR branch
