@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Harden Runner
-        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        uses: step-security/harden-runner@dc2769abcc0fcfbadfc1df54081c1608579ef6b2 # v2.22.2
         with:
           egress-policy: audit
       - name: checkout
@@ -32,7 +32,7 @@ jobs:
         with:
           version: latest
   test-multi-arch-build:
-    uses: docker/github-builder/.github/workflows/build.yml@58cb9f5b71b1836d6f690c1e95effdeb9b98cb8a # main
+    uses: docker/github-builder/.github/workflows/build.yml@cbc9d42f8c89a55623392aadd03600965b80e963 # main
     if: ${{ !github.event.pull_request.head.repo.fork }}
     permissions:
       id-token: write # required to request the GitHub OIDC token
@@ -62,7 +62,7 @@ jobs:
       id-token: write # required to request the GitHub OIDC token
     steps:
       - name: Harden Runner
-        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        uses: step-security/harden-runner@dc2769abcc0fcfbadfc1df54081c1608579ef6b2 # v2.22.2
         with:
           egress-policy: audit
       - name: checkout code in current PR branch
@@ -70,7 +70,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Set up Docker
-        uses: docker/setup-docker-action@2bf61fb9464cc67f0cbdeabed6aa0380accd1c70 # v5.5.0
+        uses: docker/setup-docker-action@7ec28a010822b4626af4874f9448a4b05ac6f3e5 # v5.6.0
         with:
           daemon-config: |
             {
@@ -126,7 +126,7 @@ jobs:
         run: |
           docker images
       - name: Docker Scout Comparison between main branch and current PR branch
-        uses: docker/scout-action@7c6b6c3f7844478ace1ffd4e7aef649053d1f87d # v1.24.0
+        uses: docker/scout-action@a4119c5a8c5076236a54e4ce99531f7e4dd2ef84 # v1.27.0
         with:
           command: compare
           image: local://score-radius:pr-${{ github.event.number }}
@@ -146,7 +146,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Harden Runner
-        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        uses: step-security/harden-runner@dc2769abcc0fcfbadfc1df54081c1608579ef6b2 # v2.22.2
         with:
           egress-policy: audit
       - name: checkout
